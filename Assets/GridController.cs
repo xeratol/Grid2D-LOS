@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
+using UnityEngine.UI;
 
 public class GridController : MonoBehaviour
 {
@@ -11,8 +13,11 @@ public class GridController : MonoBehaviour
     [SerializeField]
     private Transform tilePrefab = null;
 
-    private TileBehavior[][] tiles;
+    public TileBehavior[][] tiles { get; private set; }
     private Vector2Int poi = new Vector2Int(-1, -1);
+
+    [SerializeField]
+    private InputField exportText = null;
 
     private void Start()
     {
@@ -21,7 +26,11 @@ public class GridController : MonoBehaviour
         Debug.Assert(cols > 0, "Invalid number of rows");
 
         SetupGrid();
+        SetupCamera();
+    }
 
+    private void SetupCamera()
+    {
         Camera.main.transform.position =
             new Vector3((cols - 1) * 0.5f, Mathf.Max(rows, cols), (rows - 1) * 0.5f);
     }
@@ -42,6 +51,19 @@ public class GridController : MonoBehaviour
                 tiles[c][r] = tile.GetComponent<TileBehavior>();
             }
         }
+    }
+
+    private void ClearGrid()
+    {
+        foreach (var tileRow in tiles)
+        {
+            foreach (var tile in tileRow)
+            {
+                Destroy(tile.gameObject);
+            }
+        }
+
+        tiles = null;
     }
 
     private void Update()
@@ -107,5 +129,355 @@ public class GridController : MonoBehaviour
         }
 
         return null;
+    }
+
+    #region Preset Maps
+    public void LoadMap01()
+    {
+        ClearGrid();
+
+        rows = 20;
+        cols = 20;
+        SetupGrid();
+        SetupCamera();
+
+        StartCoroutine(LoadMap01More());
+    }
+
+    private IEnumerator LoadMap01More()
+    {
+        yield return 0; // Renderer component is not ready on the same frame
+
+        tiles[4][6].state = TileState.Wall;
+        tiles[4][7].state = TileState.Wall;
+        tiles[4][8].state = TileState.Wall;
+        tiles[4][9].state = TileState.Wall;
+        tiles[4][10].state = TileState.Wall;
+        tiles[4][11].state = TileState.Wall;
+        tiles[4][12].state = TileState.Wall;
+        tiles[4][13].state = TileState.Wall;
+        tiles[5][6].state = TileState.Wall;
+        tiles[6][6].state = TileState.Wall;
+        tiles[7][6].state = TileState.Wall;
+        tiles[8][6].state = TileState.Wall;
+        tiles[8][13].state = TileState.Wall;
+        tiles[9][6].state = TileState.Wall;
+        tiles[9][13].state = TileState.Wall;
+        tiles[10][6].state = TileState.Wall;
+        tiles[10][13].state = TileState.Wall;
+        tiles[11][6].state = TileState.Wall;
+        tiles[11][13].state = TileState.Wall;
+        tiles[12][13].state = TileState.Wall;
+        tiles[13][13].state = TileState.Wall;
+        tiles[14][13].state = TileState.Wall;
+        tiles[15][6].state = TileState.Wall;
+        tiles[15][7].state = TileState.Wall;
+        tiles[15][8].state = TileState.Wall;
+        tiles[15][9].state = TileState.Wall;
+        tiles[15][10].state = TileState.Wall;
+        tiles[15][11].state = TileState.Wall;
+        tiles[15][12].state = TileState.Wall;
+        tiles[15][13].state = TileState.Wall;
+    }
+
+    public void LoadMap02()
+    {
+        ClearGrid();
+
+        rows = 40;
+        cols = 40;
+        SetupGrid();
+        SetupCamera();
+
+        StartCoroutine(LoadMap02More());
+    }
+
+    private IEnumerator LoadMap02More()
+    {
+        yield return 0; // Renderer component is not ready on the same frame
+
+        tiles[0][10].state = TileState.Wall;
+        tiles[0][17].state = TileState.Wall;
+        tiles[0][27].state = TileState.Wall;
+        tiles[1][10].state = TileState.Wall;
+        tiles[1][17].state = TileState.Wall;
+        tiles[1][27].state = TileState.Wall;
+        tiles[2][10].state = TileState.Wall;
+        tiles[2][17].state = TileState.Wall;
+        tiles[2][27].state = TileState.Wall;
+        tiles[3][10].state = TileState.Wall;
+        tiles[3][17].state = TileState.Wall;
+        tiles[3][27].state = TileState.Wall;
+        tiles[4][10].state = TileState.Wall;
+        tiles[4][27].state = TileState.Wall;
+        tiles[5][10].state = TileState.Wall;
+        tiles[5][17].state = TileState.Wall;
+        tiles[5][27].state = TileState.Wall;
+        tiles[6][10].state = TileState.Wall;
+        tiles[6][17].state = TileState.Wall;
+        tiles[6][27].state = TileState.Wall;
+        tiles[7][10].state = TileState.Wall;
+        tiles[7][17].state = TileState.Wall;
+        tiles[7][27].state = TileState.Wall;
+        tiles[8][10].state = TileState.Wall;
+        tiles[8][17].state = TileState.Wall;
+        tiles[8][27].state = TileState.Wall;
+        tiles[9][10].state = TileState.Wall;
+        tiles[9][17].state = TileState.Wall;
+        tiles[9][27].state = TileState.Wall;
+        tiles[10][17].state = TileState.Wall;
+        tiles[10][27].state = TileState.Wall;
+        tiles[11][10].state = TileState.Wall;
+        tiles[11][17].state = TileState.Wall;
+        tiles[12][10].state = TileState.Wall;
+        tiles[12][17].state = TileState.Wall;
+        tiles[12][27].state = TileState.Wall;
+        tiles[13][10].state = TileState.Wall;
+        tiles[13][17].state = TileState.Wall;
+        tiles[13][27].state = TileState.Wall;
+        tiles[14][10].state = TileState.Wall;
+        tiles[14][17].state = TileState.Wall;
+        tiles[14][27].state = TileState.Wall;
+        tiles[15][10].state = TileState.Wall;
+        tiles[15][11].state = TileState.Wall;
+        tiles[15][12].state = TileState.Wall;
+        tiles[15][13].state = TileState.Wall;
+        tiles[15][14].state = TileState.Wall;
+        tiles[15][15].state = TileState.Wall;
+        tiles[15][16].state = TileState.Wall;
+        tiles[15][17].state = TileState.Wall;
+        tiles[15][18].state = TileState.Wall;
+        tiles[15][19].state = TileState.Wall;
+        tiles[15][20].state = TileState.Wall;
+        tiles[15][21].state = TileState.Wall;
+        tiles[15][22].state = TileState.Wall;
+        tiles[15][23].state = TileState.Wall;
+        tiles[15][24].state = TileState.Wall;
+        tiles[15][25].state = TileState.Wall;
+        tiles[15][26].state = TileState.Wall;
+        tiles[15][27].state = TileState.Wall;
+        tiles[15][28].state = TileState.Wall;
+        tiles[15][29].state = TileState.Wall;
+        tiles[15][30].state = TileState.Wall;
+        tiles[15][31].state = TileState.Wall;
+        tiles[15][33].state = TileState.Wall;
+        tiles[15][34].state = TileState.Wall;
+        tiles[16][14].state = TileState.Wall;
+        tiles[16][21].state = TileState.Wall;
+        tiles[16][34].state = TileState.Wall;
+        tiles[17][14].state = TileState.Wall;
+        tiles[17][21].state = TileState.Wall;
+        tiles[17][34].state = TileState.Wall;
+        tiles[18][21].state = TileState.Wall;
+        tiles[18][34].state = TileState.Wall;
+        tiles[19][14].state = TileState.Wall;
+        tiles[19][21].state = TileState.Wall;
+        tiles[19][34].state = TileState.Wall;
+        tiles[20][14].state = TileState.Wall;
+        tiles[20][21].state = TileState.Wall;
+        tiles[20][34].state = TileState.Wall;
+        tiles[21][14].state = TileState.Wall;
+        tiles[21][21].state = TileState.Wall;
+        tiles[21][34].state = TileState.Wall;
+        tiles[22][14].state = TileState.Wall;
+        tiles[22][21].state = TileState.Wall;
+        tiles[22][34].state = TileState.Wall;
+        tiles[23][14].state = TileState.Wall;
+        tiles[23][21].state = TileState.Wall;
+        tiles[23][34].state = TileState.Wall;
+        tiles[24][14].state = TileState.Wall;
+        tiles[24][21].state = TileState.Wall;
+        tiles[24][34].state = TileState.Wall;
+        tiles[25][14].state = TileState.Wall;
+        tiles[25][21].state = TileState.Wall;
+        tiles[25][22].state = TileState.Wall;
+        tiles[25][23].state = TileState.Wall;
+        tiles[25][24].state = TileState.Wall;
+        tiles[25][25].state = TileState.Wall;
+        tiles[25][26].state = TileState.Wall;
+        tiles[25][27].state = TileState.Wall;
+        tiles[25][28].state = TileState.Wall;
+        tiles[25][30].state = TileState.Wall;
+        tiles[25][31].state = TileState.Wall;
+        tiles[25][32].state = TileState.Wall;
+        tiles[25][33].state = TileState.Wall;
+        tiles[25][34].state = TileState.Wall;
+        tiles[26][14].state = TileState.Wall;
+        tiles[26][21].state = TileState.Wall;
+        tiles[27][14].state = TileState.Wall;
+        tiles[27][21].state = TileState.Wall;
+        tiles[28][14].state = TileState.Wall;
+        tiles[28][21].state = TileState.Wall;
+        tiles[29][14].state = TileState.Wall;
+        tiles[29][21].state = TileState.Wall;
+        tiles[30][14].state = TileState.Wall;
+        tiles[30][21].state = TileState.Wall;
+        tiles[31][14].state = TileState.Wall;
+        tiles[32][14].state = TileState.Wall;
+        tiles[32][21].state = TileState.Wall;
+        tiles[33][14].state = TileState.Wall;
+        tiles[33][21].state = TileState.Wall;
+        tiles[34][14].state = TileState.Wall;
+        tiles[34][21].state = TileState.Wall;
+        tiles[35][14].state = TileState.Wall;
+        tiles[35][21].state = TileState.Wall;
+        tiles[36][14].state = TileState.Wall;
+        tiles[36][21].state = TileState.Wall;
+        tiles[37][14].state = TileState.Wall;
+        tiles[37][21].state = TileState.Wall;
+        tiles[38][14].state = TileState.Wall;
+        tiles[38][21].state = TileState.Wall;
+        tiles[39][14].state = TileState.Wall;
+        tiles[39][21].state = TileState.Wall;
+    }
+
+    public void LoadMap03()
+    {
+        ClearGrid();
+
+        rows = 40;
+        cols = 40;
+        SetupGrid();
+        SetupCamera();
+
+        StartCoroutine(LoadMap03More());
+    }
+
+    private IEnumerator LoadMap03More()
+    {
+        yield return 0; // Renderer component is not ready on the same frame
+
+        tiles[0][27].state = TileState.Wall;
+        tiles[0][32].state = TileState.Wall;
+        tiles[0][39].state = TileState.Wall;
+        tiles[1][4].state = TileState.Wall;
+        tiles[1][12].state = TileState.Wall;
+        tiles[1][18].state = TileState.Wall;
+        tiles[1][24].state = TileState.Wall;
+        tiles[1][29].state = TileState.Wall;
+        tiles[1][35].state = TileState.Wall;
+        tiles[1][37].state = TileState.Wall;
+        tiles[2][9].state = TileState.Wall;
+        tiles[2][16].state = TileState.Wall;
+        tiles[2][27].state = TileState.Wall;
+        tiles[2][30].state = TileState.Wall;
+        tiles[2][34].state = TileState.Wall;
+        tiles[3][21].state = TileState.Wall;
+        tiles[3][38].state = TileState.Wall;
+        tiles[4][26].state = TileState.Wall;
+        tiles[4][28].state = TileState.Wall;
+        tiles[4][31].state = TileState.Wall;
+        tiles[4][36].state = TileState.Wall;
+        tiles[5][4].state = TileState.Wall;
+        tiles[5][8].state = TileState.Wall;
+        tiles[5][12].state = TileState.Wall;
+        tiles[5][18].state = TileState.Wall;
+        tiles[5][23].state = TileState.Wall;
+        tiles[5][33].state = TileState.Wall;
+        tiles[5][39].state = TileState.Wall;
+        tiles[6][1].state = TileState.Wall;
+        tiles[6][30].state = TileState.Wall;
+        tiles[6][36].state = TileState.Wall;
+        tiles[7][15].state = TileState.Wall;
+        tiles[7][27].state = TileState.Wall;
+        tiles[7][35].state = TileState.Wall;
+        tiles[7][38].state = TileState.Wall;
+        tiles[8][21].state = TileState.Wall;
+        tiles[8][30].state = TileState.Wall;
+        tiles[8][33].state = TileState.Wall;
+        tiles[8][39].state = TileState.Wall;
+        tiles[9][7].state = TileState.Wall;
+        tiles[9][11].state = TileState.Wall;
+        tiles[9][25].state = TileState.Wall;
+        tiles[9][36].state = TileState.Wall;
+        tiles[10][15].state = TileState.Wall;
+        tiles[10][19].state = TileState.Wall;
+        tiles[10][38].state = TileState.Wall;
+        tiles[11][25].state = TileState.Wall;
+        tiles[11][27].state = TileState.Wall;
+        tiles[12][23].state = TileState.Wall;
+        tiles[12][32].state = TileState.Wall;
+        tiles[12][35].state = TileState.Wall;
+        tiles[12][37].state = TileState.Wall;
+        tiles[13][30].state = TileState.Wall;
+        tiles[13][38].state = TileState.Wall;
+        tiles[14][6].state = TileState.Wall;
+        tiles[14][15].state = TileState.Wall;
+        tiles[14][20].state = TileState.Wall;
+        tiles[15][24].state = TileState.Wall;
+        tiles[15][33].state = TileState.Wall;
+        tiles[16][29].state = TileState.Wall;
+        tiles[16][36].state = TileState.Wall;
+        tiles[16][38].state = TileState.Wall;
+        tiles[17][2].state = TileState.Wall;
+        tiles[18][19].state = TileState.Wall;
+        tiles[18][24].state = TileState.Wall;
+        tiles[18][39].state = TileState.Wall;
+        tiles[19][10].state = TileState.Wall;
+        tiles[19][30].state = TileState.Wall;
+        tiles[19][32].state = TileState.Wall;
+        tiles[19][35].state = TileState.Wall;
+        tiles[20][37].state = TileState.Wall;
+        tiles[21][21].state = TileState.Wall;
+        tiles[21][26].state = TileState.Wall;
+        tiles[21][33].state = TileState.Wall;
+        tiles[22][1].state = TileState.Wall;
+        tiles[23][7].state = TileState.Wall;
+        tiles[23][28].state = TileState.Wall;
+        tiles[23][36].state = TileState.Wall;
+        tiles[23][38].state = TileState.Wall;
+        tiles[25][15].state = TileState.Wall;
+        tiles[26][23].state = TileState.Wall;
+        tiles[26][28].state = TileState.Wall;
+        tiles[26][34].state = TileState.Wall;
+        tiles[27][3].state = TileState.Wall;
+        tiles[27][8].state = TileState.Wall;
+        tiles[27][36].state = TileState.Wall;
+        tiles[28][38].state = TileState.Wall;
+        tiles[29][33].state = TileState.Wall;
+        tiles[30][20].state = TileState.Wall;
+        tiles[31][7].state = TileState.Wall;
+        tiles[31][37].state = TileState.Wall;
+        tiles[32][28].state = TileState.Wall;
+        tiles[33][14].state = TileState.Wall;
+        tiles[33][34].state = TileState.Wall;
+        tiles[36][4].state = TileState.Wall;
+        tiles[36][23].state = TileState.Wall;
+        tiles[37][28].state = TileState.Wall;
+        tiles[37][34].state = TileState.Wall;
+        tiles[38][15].state = TileState.Wall;
+    }
+    #endregion
+
+    public void ClearMap()
+    {
+        foreach (var tileRow in tiles)
+        {
+            foreach (var tile in tileRow)
+            {
+                tile.state = TileState.Open;
+            }
+        }
+    }
+
+    public void ExportMap()
+    {
+        var text = "";
+        text += "rows = " + rows + ";" + System.Environment.NewLine;
+        text += "cols = " + cols + ";" + System.Environment.NewLine;
+
+        for (var c = 0; c < rows; ++c)
+        {
+            for (var r = 0; r < rows; ++r)
+            {
+                if (tiles[c][r].state == TileState.Wall)
+                {
+                    text += "tiles[" + c + "][" + r + "].state = TileState." + tiles[c][r].state.ToString() + ";" + System.Environment.NewLine;
+                }
+            }
+        }
+
+        exportText.gameObject.SetActive(true);
+        exportText.text = text;
     }
 }

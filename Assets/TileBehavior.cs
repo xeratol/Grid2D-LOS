@@ -9,7 +9,7 @@ public enum TileState
 
 public class TileBehavior : MonoBehaviour
 {
-    private TileState _state;
+    private TileState _state = TileState.Open;
     public TileState state
     {
         get
