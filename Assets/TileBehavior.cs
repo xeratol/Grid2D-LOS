@@ -4,7 +4,14 @@ public enum TileState
 {
     Open,
     Wall,
-    POI
+    POI,
+}
+
+public enum Visibility
+{
+    Unknown,
+    Visible,
+    Hidden,
 }
 
 public class TileBehavior : MonoBehaviour
@@ -18,8 +25,28 @@ public class TileBehavior : MonoBehaviour
         }
         set
         {
-            _state = value;
-            UpdateColorBasedOnState();
+            if (_state != value)
+            {
+                _state = value;
+                UpdateColorBasedOnState();
+            }
+        }
+    }
+
+    private Visibility _visibility;
+    public Visibility visibility
+    {
+        get
+        {
+            return _visibility;
+        }
+        set
+        {
+            if (_visibility != value)
+            {
+                _visibility = value;
+                UpdateColorBasedOnState();
+            }
         }
     }
 
@@ -28,7 +55,14 @@ public class TileBehavior : MonoBehaviour
         switch (_state)
         {
             case TileState.Open:
-                _material.color = Color.white;
+                if (_visibility == Visibility.Visible)
+                {
+                    _material.color = Color.blue;
+                }
+                else
+                {
+                    _material.color = Color.white;
+                }
                 break;
             case TileState.Wall:
                 _material.color = Color.black;

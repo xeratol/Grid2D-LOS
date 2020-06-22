@@ -64,6 +64,7 @@ public class GridController : MonoBehaviour
         }
 
         tiles = null;
+        poi = new Vector2Int(-1, -1);
     }
 
     private void Update()
@@ -94,7 +95,86 @@ public class GridController : MonoBehaviour
                 poi = new Vector2Int((int)tile.transform.position.x, (int)tile.transform.position.z);
             }
 
-            // Update Visibility
+            UpdateVisibility();
+        }
+    }
+
+    private void UpdateVisibility()
+    {
+        // http://playtechs.blogspot.com/2007/03/raytracing-on-grid.html
+
+        //var end = new Vector2Int(rows-1, cols-1); // TEMP
+        var end = new Vector2Int(0, 0); // TEMP
+
+        var blocked = false;
+
+        var diff = end - poi;
+        var inc = new Vector2Int((diff.x > 0) ? 1 : -1, (diff.y > 0) ? 1 : -1);
+        diff.x = Mathf.Abs(diff.x);
+        diff.y = Mathf.Abs(diff.y);
+        var point = poi;
+        var error = diff.x - diff.y;
+        diff *= 2;
+
+        while (point != end)
+        {
+            UpdateTileForVisiblity(point, ref blocked);
+            if (error > 0)
+            {
+                point.x += inc.x;
+                error -= diff.y;
+            }
+            else if (error < 0)
+            {
+                point.y += inc.y;
+                error += diff.x;
+            }
+            else // error == 0
+            {
+                if (diff.x < diff.y)
+                {
+                    // horizontal then vertical
+                    UpdateTileForVisiblity(new Vector2Int(point.x + inc.x, point.y), ref blocked);
+                    UpdateTileForVisiblity(new Vector2Int(point.x, point.y + inc.y), ref blocked);
+                }
+                else
+                {
+                    // vertical then horizontal
+                    UpdateTileForVisiblity(new Vector2Int(point.x, point.y + inc.y), ref blocked);
+                    UpdateTileForVisiblity(new Vector2Int(point.x + inc.x, point.y), ref blocked);
+                }
+                point += inc;
+                error += -diff.y + diff.x;
+            }
+        }
+        UpdateTileForVisiblity(point, ref blocked);
+    }
+
+    private void UpdateTileForVisiblity(Vector2Int point, ref bool blocked)
+    {
+        //Debug.LogFormat("{0} - {1}", point, blocked);
+        var tile = tiles[point.x][point.y];
+        if (tile.state == TileState.Open)
+        {
+            if (tile.visibility == Visibility.Unknown)
+            {
+                if (blocked)
+                {
+                    tile.visibility = Visibility.Hidden;
+                }
+                else
+                {
+                    tile.visibility = Visibility.Visible;
+                }
+            }
+            else if (tile.visibility == Visibility.Hidden)
+            {
+                blocked = true;
+            }
+        }
+        else if (tile.state == TileState.Wall)
+        {
+            blocked = true;
         }
     }
 
@@ -449,6 +529,7 @@ public class GridController : MonoBehaviour
     }
     #endregion
 
+    #region Map Operations
     public void ClearMap()
     {
         foreach (var tileRow in tiles)
@@ -456,8 +537,10 @@ public class GridController : MonoBehaviour
             foreach (var tile in tileRow)
             {
                 tile.state = TileState.Open;
+                tile.visibility = Visibility.Unknown;
             }
         }
+        poi = new Vector2Int(-1, -1);
     }
 
     public void ExportMap()
@@ -480,4 +563,5 @@ public class GridController : MonoBehaviour
         exportText.gameObject.SetActive(true);
         exportText.text = text;
     }
+    #endregion
 }
