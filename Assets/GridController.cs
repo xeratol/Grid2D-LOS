@@ -19,6 +19,9 @@ public class GridController : MonoBehaviour
     [SerializeField]
     private InputField exportText = null;
 
+    [SerializeField]
+    private LineRenderer lineRenderer = null;
+
     private void Start()
     {
         Debug.Assert(tilePrefab, "Tile Prefab not set");
@@ -65,6 +68,11 @@ public class GridController : MonoBehaviour
 
         tiles = null;
         poi = new Vector2Int(-1, -1);
+
+        if (lineRenderer)
+        {
+            lineRenderer.positionCount = 0;
+        }
     }
 
     private void Update()
@@ -96,6 +104,13 @@ public class GridController : MonoBehaviour
             }
 
             UpdateVisibility();
+
+            if (lineRenderer)
+            {
+                lineRenderer.positionCount = 2;
+                lineRenderer.SetPosition(0, new Vector3((int)tile.transform.position.x,0.1f, (int)tile.transform.position.z));
+                lineRenderer.SetPosition(1, new Vector3(0, 0.1f, 0));
+            }
         }
     }
 
@@ -541,6 +556,11 @@ public class GridController : MonoBehaviour
             }
         }
         poi = new Vector2Int(-1, -1);
+
+        if (lineRenderer)
+        {
+            lineRenderer.positionCount = 0;
+        }
     }
 
     public void ExportMap()
