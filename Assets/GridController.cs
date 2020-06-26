@@ -14,7 +14,7 @@ public class GridController : MonoBehaviour
     private Transform tilePrefab = null;
 
     public TileBehavior[][] tiles { get; private set; }
-    private Vector2Int poi = new Vector2Int(-1, -1);
+    private Vector2Int [] poi = new Vector2Int[2];
 
     [SerializeField]
     private InputField exportText = null;
@@ -34,6 +34,8 @@ public class GridController : MonoBehaviour
 
     private void SetupCamera()
     {
+        Camera.main.orthographic = true;
+        Camera.main.orthographicSize = (Mathf.Max(rows, cols) + 1) * 0.5f;
         Camera.main.transform.position =
             new Vector3((cols - 1) * 0.5f, Mathf.Max(rows, cols), (rows - 1) * 0.5f);
     }
@@ -67,7 +69,7 @@ public class GridController : MonoBehaviour
         }
 
         tiles = null;
-        poi = new Vector2Int(-1, -1);
+        poi = new Vector2Int[2];
 
         if (lineRenderer)
         {
@@ -80,36 +82,18 @@ public class GridController : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             UpdateTileWall();
-        }
-        else if (Input.GetMouseButtonDown(1))
-        {
-            SelectPOI();
+            ResetVisibility();
+            UpdateVisibility();
         }
     }
 
-    private void SelectPOI()
+    private void ResetVisibility()
     {
-        var tile = GetTileFromScreenPoint(Input.mousePosition);
-        if (tile)
+        foreach (var tileRow in tiles)
         {
-            if (tile.state == TileState.Open)
+            foreach (var tile in tileRow)
             {
-                if (poi.x != -1 && poi.y != -1)
-                {
-                    tiles[poi.x][poi.y].state = TileState.Open;
-                }
-
-                tile.state = TileState.POI;
-                poi = new Vector2Int((int)tile.transform.position.x, (int)tile.transform.position.z);
-            }
-
-            UpdateVisibility();
-
-            if (lineRenderer)
-            {
-                lineRenderer.positionCount = 2;
-                lineRenderer.SetPosition(0, new Vector3((int)tile.transform.position.x,0.1f, (int)tile.transform.position.z));
-                lineRenderer.SetPosition(1, new Vector3(0, 0.1f, 0));
+                tile.visibility = Visibility.Unknown;
             }
         }
     }
@@ -118,20 +102,17 @@ public class GridController : MonoBehaviour
     {
         // http://playtechs.blogspot.com/2007/03/raytracing-on-grid.html
 
-        //var end = new Vector2Int(rows-1, cols-1); // TEMP
-        var end = new Vector2Int(0, 0); // TEMP
-
         var blocked = false;
 
-        var diff = end - poi;
+        var diff = poi[1] - poi[0];
         var inc = new Vector2Int((diff.x > 0) ? 1 : -1, (diff.y > 0) ? 1 : -1);
         diff.x = Mathf.Abs(diff.x);
         diff.y = Mathf.Abs(diff.y);
-        var point = poi;
+        var point = poi[0];
         var error = diff.x - diff.y;
         diff *= 2;
 
-        while (point != end)
+        while (point != poi[1])
         {
             UpdateTileForVisiblity(point, ref blocked);
             if (error > 0)
@@ -555,7 +536,7 @@ public class GridController : MonoBehaviour
                 tile.visibility = Visibility.Unknown;
             }
         }
-        poi = new Vector2Int(-1, -1);
+        poi = new Vector2Int[2];
 
         if (lineRenderer)
         {
@@ -584,4 +565,23 @@ public class GridController : MonoBehaviour
         exportText.text = text;
     }
     #endregion
+
+    public void SetPOI(Vector3 worldPos, int index)
+    {
+        Debug.Assert(index < poi.Length, "Invalid index", this);
+
+        poi[index] = new Vector2Int(Mathf.RoundToInt(worldPos.x), Mathf.RoundToInt(worldPos.z));
+        poi[index].x = Mathf.Clamp(poi[index].x, 0, cols);
+        poi[index].y = Mathf.Clamp(poi[index].y, 0, rows);
+
+        if (lineRenderer)
+        {
+            lineRenderer.positionCount = 2;
+            lineRenderer.SetPosition(0, new Vector3(poi[0].x, 0.1f, poi[0].y));
+            lineRenderer.SetPosition(1, new Vector3(poi[1].x, 0.1f, poi[1].y));
+        }
+
+        ResetVisibility();
+        UpdateVisibility();
+    }
 }
