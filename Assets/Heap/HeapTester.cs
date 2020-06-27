@@ -27,7 +27,7 @@ public class HeapTester : MonoBehaviour
     private struct KeyValElement<K, V> : System.IComparable where V : System.IComparable
     {
         private readonly K _key;
-        public V Val { get; private set; }
+        public V Val;
 
         public KeyValElement(K key, V value)
         {
@@ -45,6 +45,12 @@ public class HeapTester : MonoBehaviour
         {
             return _key.GetHashCode();
         }
+
+        public override bool Equals(object obj)
+        {
+            var other = (KeyValElement<K, V>)obj;
+            return _key.Equals(other._key);
+        }
     }
 
     private int ReverseComparer<T>(T x, T y) where T : System.IComparable
@@ -58,11 +64,16 @@ public class HeapTester : MonoBehaviour
     {
         var tests = new Dictionary<string, TestCase>();
         tests.Add("Unique", TestUnique);
+        tests.Add("Find Existing", TestFind);
+        tests.Add("Find Non-Existent", TestFindNonExistent);
         tests.Add("Sorting", TestSorting);
         tests.Add("Resizing", TestResizing);
         tests.Add("Custom Sorting", TestCustomSorting);
         tests.Add("Custom Type", TestCustomType);
         tests.Add("Key Value Type", TestKeyValueType);
+        tests.Add("Key Value Type Decrease", TestKeyValueTypeDecrease);
+        tests.Add("Key Value Type Increase", TestKeyValueTypeIncrease);
+        tests.Add("Key Value Type Update", TestKeyValueTypeUpdate);
 
         foreach (var test in tests)
         {
@@ -181,6 +192,51 @@ public class HeapTester : MonoBehaviour
         return false;
     }
 
+    private bool TestFind()
+    {
+        var testHeap = new Heap<int>(5);
+        var values = new List<int>(5);
+
+        for (var i = 0; i < 5; ++i)
+        {
+            var val = i * Random.Range(0, 100);
+            testHeap.Push(val);
+            values.Add(val);
+        }
+
+        foreach (var val in values)
+        {
+            if (testHeap.Find(val) != val)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private bool TestFindNonExistent()
+    {
+        var testHeap = new Heap<int>(5);
+
+        for (var i = 0; i < 5; ++i)
+        {
+            var val = i * Random.Range(0, 100);
+            testHeap.Push(val);
+        }
+
+        try
+        {
+            testHeap.Find(-1);
+        }
+        catch (System.Exception)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     private bool TestCustomType()
     {
         var testHeap = new Heap<SingleElement<int>>();
@@ -222,12 +278,6 @@ public class HeapTester : MonoBehaviour
             var val = Random.Range(0.0f, 100.0f);
             var newElement = new KeyValElement<int, float>(i, val);
 
-            while (testHeap.Exists(newElement))
-            {
-                val = Random.Range(0, 100);
-                newElement = new KeyValElement<int, float>(i, val);
-            }
-
             testHeap.Push(newElement);
         }
 
@@ -244,4 +294,114 @@ public class HeapTester : MonoBehaviour
 
         return true;
     }
+
+    private bool TestKeyValueTypeDecrease()
+    {
+        var testHeap = new Heap<KeyValElement<int, float>>();
+
+        for (var i = 0; i < 5; ++i)
+        {
+            var val = Random.Range(11.0f, 20.0f);
+            var newElement = new KeyValElement<int, float>(i, val);
+
+            testHeap.Push(newElement);
+        }
+
+        for (var i = 0; i < 5; ++i)
+        {
+            var val = Random.Range(0.0f, 10.0f);
+            var newElement = new KeyValElement<int, float>(i, val);
+
+            testHeap.DecreaseKey(newElement);
+        }
+
+        var lastVal = new KeyValElement<int, float>(0, -1.0f);
+        while (!testHeap.IsEmpty)
+        {
+            var element = testHeap.Pop();
+            if (lastVal.CompareTo(element) >= 0)
+            {
+                return false;
+            }
+            lastVal = element;
+        }
+
+        return true;
+    }
+
+    private bool TestKeyValueTypeIncrease()
+    {
+        var testHeap = new Heap<KeyValElement<int, float>>();
+
+        for (var i = 0; i < 5; ++i)
+        {
+            var val = Random.Range(0.0f, 10.0f);
+            var newElement = new KeyValElement<int, float>(i, val);
+
+            testHeap.Push(newElement);
+        }
+
+        for (var i = 0; i < 5; ++i)
+        {
+            var val = Random.Range(11.0f, 20.0f);
+            var newElement = new KeyValElement<int, float>(i, val);
+
+            testHeap.IncreaseKey(newElement);
+        }
+
+        var lastVal = new KeyValElement<int, float>(0, -1.0f);
+        while (!testHeap.IsEmpty)
+        {
+            var element = testHeap.Pop();
+            if (lastVal.CompareTo(element) >= 0)
+            {
+                return false;
+            }
+            lastVal = element;
+        }
+
+        return true;
+    }
+
+    private bool TestKeyValueTypeUpdate()
+    {
+        var testHeap = new Heap<KeyValElement<int, float>>();
+
+        for (var i = 0; i < 5; ++i)
+        {
+            var val = Random.Range(0.0f, 10.0f);
+            var newElement = new KeyValElement<int, float>(i, val);
+
+            testHeap.Push(newElement);
+        }
+
+        for (var i = 0; i < 5; ++i)
+        {
+            var newElement = new KeyValElement<int, float>(i, 0);
+            var oldElement = testHeap.Find(newElement);
+            newElement.Val = oldElement.Val;
+
+            while (oldElement.Val.CompareTo(newElement.Val) == 0)
+            {
+                var val = Random.Range(0.0f, 100.0f);
+                newElement.Val = val;
+            }
+
+            testHeap.UpdateKey(newElement);
+        }
+
+        var lastVal = new KeyValElement<int, float>(0, -1.0f);
+        while (!testHeap.IsEmpty)
+        {
+            var element = testHeap.Pop();
+            if (lastVal.CompareTo(element) >= 0)
+            {
+                return false;
+            }
+            lastVal = element;
+        }
+
+        return true;
+    }
 }
+

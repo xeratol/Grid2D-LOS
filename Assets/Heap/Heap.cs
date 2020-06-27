@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 
 /// <summary>
-/// List-based Heap implementation.
+/// List-based Heap implementation. Does not allow duplicate elements.
 /// </summary>
 /// <typeparam name="T">Kind of thing being stored in the heap.</typeparam>
 public class Heap<T> where T : IComparable
@@ -32,7 +32,7 @@ public class Heap<T> where T : IComparable
     /// <summary>
     /// Create a new heap.
     /// </summary>
-    /// <param name="comparer">Custom Comparison delegate</param>
+    /// <param name="comparer">Custom Comparison delegate.</param>
     /// <param name="capacity">The minimum number of elements the heap is expected to hold.</param>
     public Heap(Comparison<T> comparer, int capacity = 0)
     {
@@ -104,15 +104,58 @@ public class Heap<T> where T : IComparable
         return _indexMap.ContainsKey(val);
     }
 
+    public T Find(T val)
+    {
+        if (!Exists(val))
+        {
+            throw new ArgumentException("Key does not exist");
+        }
+
+        return _heap[_indexMap[val]];
+    }
+
     /// <summary>
-    /// Increases the value of the key.
+    /// Update the value of the key. Used custom data types with key-value pairs.
+    /// </summary>
+    /// <param name="val">The new value of the key</param>
+    public void UpdateKey(T val)
+    {
+        if (!Exists(val))
+        {
+            throw new ArgumentException("Key does not exist");
+        }
+        var index = _indexMap[val];
+
+        var compare = _comparer(_heap[index], val);
+        if (compare < 0)
+        {
+            _heap[index] = val;
+            ShiftDown(index);
+        }
+        else if (compare > 0)
+        {
+            _heap[index] = val;
+            ShiftUp(index);
+        }
+        else
+        {
+            throw new ArgumentException("Key did not change");
+        }
+    }
+
+    /// <summary>
+    /// Increase the value of the key. Used custom data types with key-value pairs.
     /// </summary>
     /// <param name="val">The new value of the key</param>
     public void IncreaseKey(T val)
     {
+        if (!Exists(val))
+        {
+            throw new ArgumentException("Key does not exist");
+        }
         var index = _indexMap[val];
 
-        if (_comparer(_heap[index], val) <= 0)
+        if (_comparer(_heap[index], val) >= 0)
         {
             throw new ArgumentException("Key is expected to increase");
         }
@@ -122,14 +165,18 @@ public class Heap<T> where T : IComparable
     }
 
     /// <summary>
-    /// Decreases the value of the key.
+    /// Decrease the value of the key. Used custom data types with key-value pairs.
     /// </summary>
     /// <param name="val">The new value of the key</param>
     public void DecreaseKey(T val)
     {
+        if (!Exists(val))
+        {
+            throw new ArgumentException("Key does not exist");
+        }
         var index = _indexMap[val];
 
-        if (_comparer(_heap[index], val) >= 0)
+        if (_comparer(_heap[index], val) <= 0)
         {
             throw new ArgumentException("Key is expected to decrease");
         }
