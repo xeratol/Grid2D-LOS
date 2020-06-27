@@ -4,12 +4,12 @@ using System;
 using System.Collections.Generic;
 
 /// <summary>
-/// Array-based Heap implementation.
+/// List-based Heap implementation.
 /// </summary>
 /// <typeparam name="T">Kind of thing being stored in the heap.</typeparam>
 public class Heap<T> where T : IComparable
 {
-    private T[] _heap = null;
+    private List<T> _heap = null;
     private Dictionary<T, int> _indexMap;
     private Comparison<T> _comparer;
 
@@ -21,10 +21,10 @@ public class Heap<T> where T : IComparable
     /// <summary>
     /// Create a new heap.
     /// </summary>
-    /// <param name="minSize">The minimum number of elements the heap is expected to hold.</param>
-    public Heap(int minSize)
+    /// <param name="capacity">The minimum number of elements the heap is expected to hold.</param>
+    public Heap(int capacity = 0 )
     {
-        _heap = new T[((int)Math.Pow(2, Math.Ceiling(Math.Log(minSize, 2))))];
+        _heap = new List<T>(capacity);
         _indexMap = new Dictionary<T, int>();
         _comparer = new Comparison<T>(DefaultComparer);
     }
@@ -33,10 +33,10 @@ public class Heap<T> where T : IComparable
     /// Create a new heap.
     /// </summary>
     /// <param name="comparer">Custom Comparison delegate</param>
-    /// <param name="minSize">The minimum number of elements the heap is expected to hold.</param>
-    public Heap(Comparison<T> comparer, int minSize)
+    /// <param name="capacity">The minimum number of elements the heap is expected to hold.</param>
+    public Heap(Comparison<T> comparer, int capacity = 0)
     {
-        _heap = new T[((int)Math.Pow(2, Math.Ceiling(Math.Log(minSize, 2))))];
+        _heap = new List<T>(capacity);
         _indexMap = new Dictionary<T, int>();
         _comparer = comparer;
     }
@@ -44,12 +44,12 @@ public class Heap<T> where T : IComparable
     /// <summary>
     /// Current size of the Heap.
     /// </summary>
-    public int Count { get; private set; } = 0;
+    public int Count { get { return _heap.Count; } }
 
     /// <summary>
     /// Test to see if the Heap is empty.
     /// </summary>
-    public bool IsEmpty { get { return Count == 0; } }
+    public bool IsEmpty { get { return _heap.Count == 0; } }
 
     /// <summary>
     /// Add a new value to the Heap.
@@ -62,15 +62,9 @@ public class Heap<T> where T : IComparable
             throw new ArgumentException("Heap does not allow duplicate values");
         }
 
-        if (Count == _heap.Length)
-        {
-            DoubleHeap();
-        }
-
-        _heap[Count] = val;
         _indexMap[val] = Count;
-        ShiftUp(Count);
-        Count++;
+        _heap.Add(val);
+        ShiftUp(_indexMap[val]);
     }
 
     /// <summary>
@@ -79,10 +73,6 @@ public class Heap<T> where T : IComparable
     /// <returns></returns>
     public T Peek()
     {
-        if (_heap.Length == 0)
-        {
-            throw new ArgumentOutOfRangeException("No values in heap");
-        }
         return _heap[0];
     }
 
@@ -93,12 +83,12 @@ public class Heap<T> where T : IComparable
     public T Pop()
     {
         T output = Peek();
-        _indexMap.Remove(output);
 
-        Count--;
-
-        _heap[0] = _heap[Count];
+        _heap[0] = _heap[Count - 1];
         _indexMap[_heap[0]] = 0;
+
+        _heap.RemoveAt(Count - 1);
+        _indexMap.Remove(output);
 
         ShiftDown(0);
         return output;
@@ -173,13 +163,14 @@ public class Heap<T> where T : IComparable
     private void ShiftDown(int heapIndex)
     {
         var child1 = heapIndex * 2 + 1;
+        var child2 = child1 + 1;
+        var preferredChildIndex = child1;
+
         if (child1 >= Count)
         {
             return;
         }
-        var child2 = child1 + 1;
 
-        var preferredChildIndex = child1;
         if (child2 < Count && _comparer(_heap[child1], _heap[child2]) > 0)
         {
             preferredChildIndex = child2;
@@ -195,7 +186,7 @@ public class Heap<T> where T : IComparable
     }
 
     /// <summary>
-    /// Swap two items in the underlying array.
+    /// Swap two items in the underlying list.
     /// </summary>
     /// <param name="index1"></param>
     /// <param name="index2"></param>
@@ -207,15 +198,5 @@ public class Heap<T> where T : IComparable
 
         _indexMap[_heap[index2]] = index2;
         _indexMap[_heap[index1]] = index1;
-    }
-
-    /// <summary>
-    /// Increase the size of the underlying storage.
-    /// </summary>
-    private void DoubleHeap()
-    {
-        var copy = new T[_heap.Length * 2];
-        Array.Copy(_heap, copy, _heap.Length);
-        _heap = copy;
     }
 }
