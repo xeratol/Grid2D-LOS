@@ -3,21 +3,42 @@ using UnityEngine;
 
 public class HeapTester : MonoBehaviour
 {
-    private struct Element<K, V> : System.IComparable where V : System.IComparable
+    private struct SingleElement<K> : System.IComparable where K : System.IComparable
     {
-        private readonly K _key;
-        private V _val;
+        public K Key { get; private set; }
 
-        public Element(K key, V value)
+        public SingleElement(K key)
         {
-            _key = key;
-            _val = value;
+            Key = key;
         }
 
         public int CompareTo(object obj)
         {
-            var other = (Element<K, V>)obj;
-            return _val.CompareTo(other._val);
+            var other = (SingleElement<K>)obj;
+            return Key.CompareTo(other.Key);
+        }
+
+        public override int GetHashCode()
+        {
+            return Key.GetHashCode();
+        }
+    }
+
+    private struct KeyValElement<K, V> : System.IComparable where V : System.IComparable
+    {
+        private readonly K _key;
+        public V Val { get; private set; }
+
+        public KeyValElement(K key, V value)
+        {
+            _key = key;
+            Val = value;
+        }
+
+        public int CompareTo(object obj)
+        {
+            var other = (KeyValElement<K, V>)obj;
+            return Val.CompareTo(other.Val);
         }
 
         public override int GetHashCode()
@@ -26,15 +47,22 @@ public class HeapTester : MonoBehaviour
         }
     }
 
+    private int ReverseComparer<T>(T x, T y) where T : System.IComparable
+    {
+        return -x.CompareTo(y);
+    }
+
     private delegate bool TestCase();
 
     private void Start()
     {
         var tests = new Dictionary<string, TestCase>();
-        tests["Sorting"] = TestSorting;
-        tests["Resizing"] = TestResizing;
-        tests["Custom Sorting"] = TestCustomSorting;
-        tests["Unique"] = TestUnique;
+        tests.Add("Unique", TestUnique);
+        tests.Add("Sorting", TestSorting);
+        tests.Add("Resizing", TestResizing);
+        tests.Add("Custom Sorting", TestCustomSorting);
+        tests.Add("Custom Type", TestCustomType);
+        tests.Add("Key Value Type", TestKeyValueType);
 
         foreach (var test in tests)
         {
@@ -60,7 +88,7 @@ public class HeapTester : MonoBehaviour
             testHeap.Push(val);
         }
 
-        var lastVal = -101;
+        var lastVal = -1;
         while (!testHeap.IsEmpty)
         {
             var val = testHeap.Pop();
@@ -90,7 +118,7 @@ public class HeapTester : MonoBehaviour
             testHeap.Push(val);
         }
 
-        var lastVal = -101;
+        var lastVal = -1;
         while (!testHeap.IsEmpty)
         {
             var val = testHeap.Pop();
@@ -102,11 +130,6 @@ public class HeapTester : MonoBehaviour
         }
 
         return true;
-    }
-
-    private int ReverseComparer(int x, int y)
-    {
-        return -x.CompareTo(y);
     }
 
     private bool TestCustomSorting()
@@ -156,5 +179,69 @@ public class HeapTester : MonoBehaviour
         }
 
         return false;
+    }
+
+    private bool TestCustomType()
+    {
+        var testHeap = new Heap<SingleElement<int>>();
+
+        for (var i = 0; i < 5; ++i)
+        {
+            var val = Random.Range(0, 100);
+            var newElement = new SingleElement<int>(val);
+
+            while (testHeap.Exists(newElement))
+            {
+                val = Random.Range(0, 100);
+                newElement = new SingleElement<int>(val);
+            }
+
+            testHeap.Push(newElement);
+        }
+
+        var lastVal = new SingleElement<int>(-1);
+        while (!testHeap.IsEmpty)
+        {
+            var element = testHeap.Pop();
+            if (lastVal.CompareTo(element) >= 0)
+            {
+                return false;
+            }
+            lastVal = element;
+        }
+
+        return true;
+    }
+
+    private bool TestKeyValueType()
+    {
+        var testHeap = new Heap<KeyValElement<int, float>>();
+
+        for (var i = 0; i < 5; ++i)
+        {
+            var val = Random.Range(0.0f, 100.0f);
+            var newElement = new KeyValElement<int, float>(i, val);
+
+            while (testHeap.Exists(newElement))
+            {
+                val = Random.Range(0, 100);
+                newElement = new KeyValElement<int, float>(i, val);
+            }
+
+            testHeap.Push(newElement);
+        }
+
+        var lastVal = new KeyValElement<int, float>(0, -1.0f);
+        while (!testHeap.IsEmpty)
+        {
+            var element = testHeap.Pop();
+            if (lastVal.CompareTo(element) >= 0)
+            {
+                return false;
+            }
+            lastVal = element;
+        }
+
+        return true;
     }
 }
