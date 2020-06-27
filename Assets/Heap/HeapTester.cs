@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class HeapTester : MonoBehaviour
 {
+    const int NUM_REPEAT_TEST = 1000000;
+
     private struct SingleElement<K> : System.IComparable where K : System.IComparable
     {
         public K Key { get; private set; }
@@ -77,9 +79,21 @@ public class HeapTester : MonoBehaviour
 
         foreach (var test in tests)
         {
+            var success = true;
+
+            var i = 0;
+            for (; i < NUM_REPEAT_TEST; ++i)
+            {
+                if (!test.Value())
+                {
+                    success = false;
+                    break;
+                }
+            }
+
             Debug.LogFormat("{0} Test: {1}",
                 test.Key,
-                test.Value() ? "<color=green>Success!</color>" : "<color=red>Failed!</color>");
+                success ? "<color=green>Success!</color>" : string.Format("<color=red>Failed at {0}!</color>", i));
         }
     }
 
@@ -199,7 +213,7 @@ public class HeapTester : MonoBehaviour
 
         for (var i = 0; i < 5; ++i)
         {
-            var val = i * Random.Range(0, 100);
+            var val = (i * 10) + Random.Range(0, 9);
             testHeap.Push(val);
             values.Add(val);
         }
@@ -221,7 +235,7 @@ public class HeapTester : MonoBehaviour
 
         for (var i = 0; i < 5; ++i)
         {
-            var val = i * Random.Range(0, 100);
+            var val = (i * 10) + Random.Range(0, 9);
             testHeap.Push(val);
         }
 
@@ -281,15 +295,16 @@ public class HeapTester : MonoBehaviour
             testHeap.Push(newElement);
         }
 
-        var lastVal = new KeyValElement<int, float>(0, -1.0f);
+        var lastElement = new KeyValElement<int, float>(0, -1.0f);
         while (!testHeap.IsEmpty)
         {
             var element = testHeap.Pop();
-            if (lastVal.CompareTo(element) >= 0)
+            if (lastElement.Equals(element) &&
+                lastElement.CompareTo(element) >= 0)
             {
                 return false;
             }
-            lastVal = element;
+            lastElement = element;
         }
 
         return true;
@@ -315,15 +330,16 @@ public class HeapTester : MonoBehaviour
             testHeap.DecreaseKey(newElement);
         }
 
-        var lastVal = new KeyValElement<int, float>(0, -1.0f);
+        var lastElement = new KeyValElement<int, float>(0, -1.0f);
         while (!testHeap.IsEmpty)
         {
             var element = testHeap.Pop();
-            if (lastVal.CompareTo(element) >= 0)
+            if (lastElement.Equals(element) && 
+                lastElement.CompareTo(element) >= 0)
             {
                 return false;
             }
-            lastVal = element;
+            lastElement = element;
         }
 
         return true;
@@ -349,15 +365,16 @@ public class HeapTester : MonoBehaviour
             testHeap.IncreaseKey(newElement);
         }
 
-        var lastVal = new KeyValElement<int, float>(0, -1.0f);
+        var lastElement = new KeyValElement<int, float>(0, -1.0f);
         while (!testHeap.IsEmpty)
         {
             var element = testHeap.Pop();
-            if (lastVal.CompareTo(element) >= 0)
+            if (lastElement.Equals(element) && 
+                lastElement.CompareTo(element) >= 0)
             {
                 return false;
             }
-            lastVal = element;
+            lastElement = element;
         }
 
         return true;
@@ -383,22 +400,23 @@ public class HeapTester : MonoBehaviour
 
             while (oldElement.Val.CompareTo(newElement.Val) == 0)
             {
-                var val = Random.Range(0.0f, 100.0f);
+                var val = Random.Range(-100.0f, 100.0f);
                 newElement.Val = val;
             }
 
             testHeap.UpdateKey(newElement);
         }
 
-        var lastVal = new KeyValElement<int, float>(0, -1.0f);
+        var lastElement = new KeyValElement<int, float>(0, -200.0f);
         while (!testHeap.IsEmpty)
         {
             var element = testHeap.Pop();
-            if (lastVal.CompareTo(element) >= 0)
+            if (lastElement.Equals(element) && 
+                lastElement.CompareTo(element) >= 0)
             {
                 return false;
             }
-            lastVal = element;
+            lastElement = element;
         }
 
         return true;
