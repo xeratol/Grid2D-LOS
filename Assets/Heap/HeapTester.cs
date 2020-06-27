@@ -34,6 +34,7 @@ public class HeapTester : MonoBehaviour
         tests["Sorting"] = TestSorting;
         tests["Resizing"] = TestResizing;
         tests["Custom Sorting"] = TestCustomSorting;
+        tests["Unique"] = TestUnique;
 
         foreach (var test in tests)
         {
@@ -47,8 +48,6 @@ public class HeapTester : MonoBehaviour
     {
         var testHeap = new Heap<int>(5);
 
-        //var log = "Input: ";
-
         for (var i = 0; i < 5; ++i)
         {
             var val = Random.Range(0, 100);
@@ -58,12 +57,8 @@ public class HeapTester : MonoBehaviour
                 val = Random.Range(0, 100);
             }
 
-            //log += val + ", ";
             testHeap.Push(val);
         }
-
-        //log += System.Environment.NewLine;
-        //log += "Output: ";
 
         var lastVal = -101;
         while (!testHeap.IsEmpty)
@@ -74,11 +69,8 @@ public class HeapTester : MonoBehaviour
                 return false;
             }
             lastVal = val;
-            //log += val + ", ";
         }
-        //log += System.Environment.NewLine;
 
-        //Debug.Log(log);
         return true;
     }
 
@@ -147,4 +139,22 @@ public class HeapTester : MonoBehaviour
         return true;
     }
 
+    private bool TestUnique()
+    {
+        var testHeap = new Heap<int>(5);
+
+        var val = Random.Range(0, 100);
+        testHeap.Push(val);
+
+        try
+        {
+            testHeap.Push(val);
+        }
+        catch (System.Exception)
+        {
+            return true;
+        }
+
+        return false;
+    }
 }
