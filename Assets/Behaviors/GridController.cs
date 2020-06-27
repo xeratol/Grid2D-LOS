@@ -187,7 +187,7 @@ public class GridController : MonoBehaviour
         }
     }
 
-    private TileBehavior GetTileFromScreenPoint(Vector3 screenPoint)
+    public Vector2Int GetGridPosFromScreenPoint(Vector3 screenPoint)
     {
         var ray = Camera.main.ScreenPointToRay(screenPoint);
         var plane = new Plane(Vector3.up, 0);
@@ -198,10 +198,20 @@ public class GridController : MonoBehaviour
             var c = Mathf.RoundToInt(pt.x);
             var r = Mathf.RoundToInt(pt.z);
 
-            if (c >= 0 && c< cols && r >= 0 && r < rows)
-            {
-                return tiles[c][r];
-            }
+            return new Vector2Int(c, r);
+        }
+
+        Debug.LogError("Should never reached here", this);
+        return new Vector2Int(-1, -1);
+    }
+
+    private TileBehavior GetTileFromScreenPoint(Vector3 screenPoint)
+    {
+        var gridPos = GetGridPosFromScreenPoint(screenPoint);
+        if (gridPos.x >= 0 && gridPos.x < cols &&
+            gridPos.y >= 0 && gridPos.y < rows)
+        {
+            return tiles[gridPos.x][gridPos.y];
         }
 
         return null;
@@ -571,8 +581,8 @@ public class GridController : MonoBehaviour
         Debug.Assert(index < poi.Length, "Invalid index", this);
 
         poi[index] = new Vector2Int(Mathf.RoundToInt(worldPos.x), Mathf.RoundToInt(worldPos.z));
-        poi[index].x = Mathf.Clamp(poi[index].x, 0, cols);
-        poi[index].y = Mathf.Clamp(poi[index].y, 0, rows);
+        poi[index].x = Mathf.Clamp(poi[index].x, 0, cols - 1);
+        poi[index].y = Mathf.Clamp(poi[index].y, 0, rows - 1);
 
         if (lineRenderer)
         {
