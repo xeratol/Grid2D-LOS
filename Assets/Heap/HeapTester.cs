@@ -70,6 +70,8 @@ public class HeapTester : MonoBehaviour
         tests.Add("Find Non-Existent", TestFindNonExistent);
         tests.Add("Sorting", TestSorting);
         tests.Add("Resizing", TestResizing);
+        tests.Add("Empty", TestEmpty);
+        tests.Add("Clear", TestClear);
         tests.Add("Custom Sorting", TestCustomSorting);
         tests.Add("Custom Type", TestCustomType);
         tests.Add("Key Value Type", TestKeyValueType);
@@ -249,6 +251,33 @@ public class HeapTester : MonoBehaviour
         }
 
         return false;
+    }
+
+    private bool TestEmpty()
+    {
+        var testHeap = new Heap<int>();
+        return testHeap.IsEmpty;
+    }
+
+    private bool TestClear()
+    {
+        var testHeap = new Heap<int>();
+
+        for (var i = 0; i < 5; ++i)
+        {
+            var val = Random.Range(0, 100);
+
+            while (testHeap.Exists(val))
+            {
+                val = Random.Range(0, 100);
+            }
+
+            testHeap.Push(val);
+        }
+
+        testHeap.Clear();
+
+        return testHeap.IsEmpty;
     }
 
     private bool TestCustomType()

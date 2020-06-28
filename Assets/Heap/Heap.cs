@@ -186,6 +186,15 @@ public class Heap<T> where T : IComparable
     }
 
     /// <summary>
+    /// Clears the data.
+    /// </summary>
+    public void Clear()
+    {
+        _heap.Clear();
+        _indexMap.Clear();
+    }
+
+    /// <summary>
     /// Move an element up the Heap.
     /// </summary>
     /// <param name="heapIndex"></param>
