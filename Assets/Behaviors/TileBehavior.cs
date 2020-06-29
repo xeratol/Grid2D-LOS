@@ -73,9 +73,9 @@ public class TileBehavior : MonoBehaviour
         }
     }
 
-    private Material _material;
+    private Material _material = null;
 
-    private void Start()
+    private void Awake()
     {
         _material = GetComponent<Renderer>().material;
     }
