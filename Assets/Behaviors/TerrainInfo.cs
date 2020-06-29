@@ -16,7 +16,12 @@ public class TerrainInfo : MonoBehaviour
     private bool[,] _wallLayer = null;
     private bool _isDirty = false;
 
-    private Action _onWallChange;
+    public event Action OnWallChange;
+
+    private void Start()
+    {
+        ResetWalls();
+    }
 
     public void InitWalls(int rows, int cols)
     {
@@ -32,18 +37,21 @@ public class TerrainInfo : MonoBehaviour
         _isDirty = true;
     }
 
+    public bool IsValidGrisPosition(int row, int col)
+    {
+        return row >= 0 && row < _rows && col >= 0 && col < _cols;
+    }
+
     public bool IsWall(int row, int col)
     {
-        Debug.Assert(row >= 0 && row < _rows, "Row is out of bounds", this);
-        Debug.Assert(col >= 0 && col < _cols, "Col is out of bounds", this);
+        Debug.Assert(IsValidGrisPosition(row, col), "Out of bounds", this);
 
         return _wallLayer[col, row];
     }
 
     public void SetWall(int row, int col)
     {
-        Debug.Assert(row >= 0 && row < _rows, "Row is out of bounds", this);
-        Debug.Assert(col >= 0 && col < _cols, "Col is out of bounds", this);
+        Debug.Assert(IsValidGrisPosition(row, col), "Out of bounds", this);
 
         if (!_wallLayer[col, row])
         {
@@ -54,8 +62,7 @@ public class TerrainInfo : MonoBehaviour
 
     public void RemoveWall(int row, int col)
     {
-        Debug.Assert(row >= 0 && row < _rows, "Row is out of bounds", this);
-        Debug.Assert(col >= 0 && col < _cols, "Col is out of bounds", this);
+        Debug.Assert(IsValidGrisPosition(row, col), "Out of bounds", this);
 
         if (_wallLayer[col, row])
         {
@@ -64,21 +71,11 @@ public class TerrainInfo : MonoBehaviour
         }
     }
 
-    public void AddWallChangeListener(Action listener)
-    {
-        _onWallChange += listener;
-    }
-
-    public void RemoveWallChangeListener(Action listener)
-    {
-        _onWallChange -= listener;
-    }
-
     private void LateUpdate()
     {
         if (_isDirty)
         {
-            _onWallChange?.Invoke();
+            OnWallChange?.Invoke();
             _isDirty = false;
         }
     }

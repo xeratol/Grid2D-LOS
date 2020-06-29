@@ -18,14 +18,14 @@ public class TerrainVisualizer : MonoBehaviour
         Debug.Assert(tilePrefab, "Tile Prefab not set");
 
         InitTiles();
-        _terrainInfo.AddWallChangeListener(OnWallChangeListener);
+        _terrainInfo.OnWallChange += OnWallChangeListener;
     }
 
     private void OnDestroy()
     {
         if (_terrainInfo)
         {
-            _terrainInfo.RemoveWallChangeListener(OnWallChangeListener);
+            _terrainInfo.OnWallChange -= OnWallChangeListener;
         }
     }
 
@@ -73,5 +73,13 @@ public class TerrainVisualizer : MonoBehaviour
 
         InitTiles();
         UpdateTiles();
+    }
+
+    public TileBehavior GetTileAt(int row, int col)
+    {
+        Debug.Assert(row >= 0 && row < _terrainInfo.Rows, "Row is out of bounds", this);
+        Debug.Assert(col >= 0 && col < _terrainInfo.Cols, "Col is out of bounds", this);
+
+        return _tiles[col, row];
     }
 }

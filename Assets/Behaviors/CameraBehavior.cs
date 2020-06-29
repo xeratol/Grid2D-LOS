@@ -11,7 +11,15 @@ public class CameraBehavior : MonoBehaviour
 
         SetupCamera();
 
-        _terrainInfo.AddWallChangeListener(OnWallChangeListener);
+        _terrainInfo.OnWallChange += OnWallChangeListener;
+    }
+
+    void OnDestroy()
+    {
+        if (_terrainInfo)
+        {
+            _terrainInfo.OnWallChange -= OnWallChangeListener;
+        }
     }
 
     private void OnWallChangeListener()

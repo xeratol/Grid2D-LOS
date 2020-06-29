@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TerrainLoader : MonoBehaviour
+public class TerrainImporter : MonoBehaviour
 {
     [SerializeField]
     private TerrainInfo _terrainInfo = null;
