@@ -15,7 +15,7 @@ public class TerrainVisualizer : MonoBehaviour
     private void Start()
     {
         Debug.Assert(_terrainInfo, "Terrain Info not set", this);
-        Debug.Assert(tilePrefab, "Tile Prefab not set");
+        Debug.Assert(tilePrefab, "Tile Prefab not set", this);
 
         InitTiles();
         _terrainInfo.OnMapChange += OnMapChangeListener;
@@ -56,11 +56,11 @@ public class TerrainVisualizer : MonoBehaviour
 
     public void UpdateTiles()
     {
-        for (var c = 0; c < _terrainInfo.Cols; ++c)
+        for (var col = 0; col < _terrainInfo.Cols; ++col)
         {
-            for (var r = 0; r < _terrainInfo.Rows; ++r)
+            for (var row = 0; row < _terrainInfo.Rows; ++row)
             {
-                _tiles[c, r].state = _terrainInfo.IsWall(c, r) ? TileState.Wall : TileState.Open;
+                _tiles[col, row].state = _terrainInfo.IsWall(col, row) ? TileState.Wall : TileState.Open;
             }
         }
     }
@@ -75,11 +75,17 @@ public class TerrainVisualizer : MonoBehaviour
         UpdateTiles();
     }
 
-    public TileBehavior GetTileAt(int row, int col)
-    {
-        Debug.Assert(row >= 0 && row < _terrainInfo.Rows, "Row is out of bounds", this);
-        Debug.Assert(col >= 0 && col < _terrainInfo.Cols, "Col is out of bounds", this);
+    //public TileBehavior GetTileAt(int col, int row)
+    //{
+    //    Debug.Assert(_terrainInfo.IsValidGrisPosition(col, row), "Out of bounds", this);
 
-        return _tiles[col, row];
+    //    return _tiles[col, row];
+    //}
+
+    public void SetTileColor(Vector2Int pos, Color color)
+    {
+        Debug.Assert(_terrainInfo.IsValidGrisPosition(pos), "Out of bounds", this);
+
+        _tiles[pos.x, pos.y].SetColor(color);
     }
 }

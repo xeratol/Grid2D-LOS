@@ -26,11 +26,11 @@ public class TerrainExporter : MonoBehaviour
         text += "rows = " + rows + ";" + System.Environment.NewLine;
         text += "cols = " + cols + ";" + System.Environment.NewLine;
 
-        for (var col = 0; col < rows; ++col)
+        for (var col = 0; col < cols; ++col)
         {
             for (var row = 0; row < rows; ++row)
             {
-                if (_terrainInfo.IsWall(row, col))
+                if (_terrainInfo.IsWall(col, row))
                 {
                     text += "_terrainInfo.SetWall(" + col + ", " + row + ");" + System.Environment.NewLine;
                 }

@@ -23,7 +23,7 @@ public class TerrainInfo : MonoBehaviour
         ResetWalls();
     }
 
-    public void InitWalls(int rows, int cols)
+    public void InitWalls(int cols, int rows)
     {
         _rows = rows;
         _cols = cols;
@@ -37,21 +37,31 @@ public class TerrainInfo : MonoBehaviour
         _isDirty = true;
     }
 
-    public bool IsValidGrisPosition(int row, int col)
+    public bool IsValidGrisPosition(int col, int row)
     {
         return row >= 0 && row < _rows && col >= 0 && col < _cols;
     }
 
-    public bool IsWall(int row, int col)
+    public bool IsValidGrisPosition(Vector2Int pos)
     {
-        Debug.Assert(IsValidGrisPosition(row, col), "Out of bounds", this);
+        return IsValidGrisPosition(pos.x, pos.y);
+    }
+
+    public bool IsWall(int col, int row)
+    {
+        Debug.Assert(IsValidGrisPosition(col, row), "Out of bounds", this);
 
         return _wallLayer[col, row];
     }
 
-    public void SetWall(int row, int col)
+    public bool IsWall(Vector2Int pos)
     {
-        Debug.Assert(IsValidGrisPosition(row, col), "Out of bounds", this);
+        return IsWall(pos.x, pos.y);
+    }
+
+    public void SetWall(int col, int row)
+    {
+        Debug.Assert(IsValidGrisPosition(col, row), "Out of bounds", this);
 
         if (!_wallLayer[col, row])
         {
@@ -60,9 +70,14 @@ public class TerrainInfo : MonoBehaviour
         }
     }
 
-    public void RemoveWall(int row, int col)
+    public void SetWall(Vector2Int gridPos)
     {
-        Debug.Assert(IsValidGrisPosition(row, col), "Out of bounds", this);
+        SetWall(gridPos.x, gridPos.y);
+    }
+
+    public void RemoveWall(int col, int row)
+    {
+        Debug.Assert(IsValidGrisPosition(col, row), "Out of bounds", this);
 
         if (_wallLayer[col, row])
         {
@@ -71,11 +86,16 @@ public class TerrainInfo : MonoBehaviour
         }
     }
 
+    public void RemoveWall(Vector2Int gridPos)
+    {
+        RemoveWall(gridPos.x, gridPos.y);
+    }
+
     private void LateUpdate()
     {
         if (_isDirty)
         {
-            OnWallChange?.Invoke();
+            OnMapChange?.Invoke();
             _isDirty = false;
         }
     }
