@@ -80,4 +80,13 @@ public class TileBehavior : MonoBehaviour
         _material = GetComponent<Renderer>().material;
     }
 
+    public void SetColor(Color color)
+    {
+        if (_state == TileState.Wall)
+        {
+            return;
+        }
+
+        _material.color = color;
+    }
 }
