@@ -18,14 +18,14 @@ public class TerrainVisualizer : MonoBehaviour
         Debug.Assert(tilePrefab, "Tile Prefab not set");
 
         InitTiles();
-        _terrainInfo.OnWallChange += OnWallChangeListener;
+        _terrainInfo.OnMapChange += OnMapChangeListener;
     }
 
     private void OnDestroy()
     {
         if (_terrainInfo)
         {
-            _terrainInfo.OnWallChange -= OnWallChangeListener;
+            _terrainInfo.OnMapChange -= OnMapChangeListener;
         }
     }
 
@@ -65,7 +65,7 @@ public class TerrainVisualizer : MonoBehaviour
         }
     }
 
-    private void OnWallChangeListener()
+    private void OnMapChangeListener()
     {
         // FIXME could be optimized (see capacity)
 

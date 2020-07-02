@@ -16,7 +16,7 @@ public class TerrainInfo : MonoBehaviour
     private bool[,] _wallLayer = null;
     private bool _isDirty = false;
 
-    public event Action OnWallChange;
+    public event Action OnMapChange;
 
     private void Start()
     {

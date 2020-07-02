@@ -11,18 +11,18 @@ public class CameraBehavior : MonoBehaviour
 
         SetupCamera();
 
-        _terrainInfo.OnWallChange += OnWallChangeListener;
+        _terrainInfo.OnMapChange += OnMapChangeListener;
     }
 
     void OnDestroy()
     {
         if (_terrainInfo)
         {
-            _terrainInfo.OnWallChange -= OnWallChangeListener;
+            _terrainInfo.OnMapChange -= OnMapChangeListener;
         }
     }
 
-    private void OnWallChangeListener()
+    private void OnMapChangeListener()
     {
         SetupCamera();
     }
