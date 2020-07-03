@@ -177,10 +177,10 @@ public class GridPathfinder
                     }
                 }
 
-                var distance = ((i % 2) == 1) ? 1.0f : 1.3f;
+                var distance = ((i % 2) == 1) ? 1.0f : 1.41421356237f;
                 var newGivenCost = currentNodeInfo.givenCost + distance;
                 var heuristicCost = GridHelper.GetOctileDistance(neighbor, _end);
-                var newTotalCost = newGivenCost + heuristicCost;
+                var newTotalCost = newGivenCost + heuristicCost * 1.05f;
                 ref var neighborNode = ref _allNodes[neighbor.x, neighbor.y];
 
                 if (neighborNode.requestIteration != _requestCount)
@@ -214,6 +214,7 @@ public class GridPathfinder
         }
         else
         {
+            Result = new List<Vector2Int>();
             State = PathFinderState.DONE;
         }
     }

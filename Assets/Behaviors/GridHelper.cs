@@ -95,6 +95,6 @@ public class GridHelper : MonoBehaviour
         var max = Mathf.Max(dx, dy);
         var diff = max - min;
 
-        return min * 1.3f + diff;
+        return min * 1.41421356237f + diff;
     }
 }
